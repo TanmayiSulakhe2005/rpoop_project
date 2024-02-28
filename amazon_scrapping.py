@@ -35,24 +35,23 @@ links = soup.find_all("a",attrs={'class':'a-link-normal s-underline-text s-under
 
 links_list = []
 for link in links:
-            links_list.append(link.get('href'))
+            links_list.append( link.get('href'))
 
 d = {"title":[], "price":[]}
 
 
 for link in links_list:
-    try:
-        productlist = "https://www.amazon.in" + link
-    except ConnectionError:
-        cleaned_link = link.replace("https://", "")
-        productlist = "https://www.amazon.in" + cleaned_link
-    inside_webpage = requests.get(productlist,headers=HEADERS)
-    new_soup = BeautifulSoup(inside_webpage.content, "html.parser")
+     productlist =  "https://www.amazon.in" + link
+     if "www.amazon.inhttps" in productlist:
+          print("link corrupted")
+          continue
+     inside_webpage = requests.get(productlist,headers=HEADERS)
+     new_soup = BeautifulSoup(inside_webpage.content, "html.parser")
 
-    d['title'].append(get_title(new_soup))
-    d['price'].append(get_price(new_soup))
+     d['title'].append(get_title(new_soup))
+     d['price'].append(get_price(new_soup))
 
-    
-    amazon_df = pd.DataFrame.from_dict(d)
-    amazon_df = amazon_df.dropna(subset=['title'])
-    amazon_df.to_csv("amazon_data.csv", header=True, index=False)
+
+     amazon_df = pd.DataFrame.from_dict(d)
+     amazon_df = amazon_df.dropna(subset=['title'])
+     amazon_df.to_csv("amazon_data.csv", header=True, index=False)
